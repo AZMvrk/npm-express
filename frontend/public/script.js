@@ -2,29 +2,38 @@ console.log('loaded')
 const rootElement = document.querySelector("#root")
 
 const fetchUrl = async (url) => {
-  const data = await fetch(url)
-  return data.json()
+  const response = await fetch(url)
+  console.log(response)
+  return response.json()
+}
 
-  // if (data.ok) {
-  //   /* ha a kapott válasz OK status kóddal rendelkezik */
-  //   return data.json()
-  // } else if (data.status === 400 || data.status === 404) {
-  //   return data.json()
-  // } else {
-  //   /* ha a kapott válasz nem OK status kóddal rendelkezik */
-  //   return "bad request"
-  // }
+const beerComponent = (beer) => `
+  <div>
+    <h2>${beer.id}</h2>
+    <h3>${beer.name}</h3>
+    <h4>${beer.abv}</h4>
+  </div>
+`
+
+const errorComponent = (error) => `
+  <div>
+    <h2>${error.error}</h2>
+    <h3>${error.message}</h3>
+  </div>
+`
+
+const makeDomFromData = (element, data) => {
+  element.innerHTML = ""
+  if (data.id) element.insertAdjacentHTML("beforeend", beerComponent(data))
+  else if (data.length) data.forEach(beer => element.insertAdjacentHTML("beforeend", beerComponent(beer))) 
+  else element.insertAdjacentHTML("beforeend", errorComponent(data))
 }
 
 async function init() {
-  const beerData = await fetchUrl("/beers/10")
-  rootElement.innerHTML = JSON.stringify(beerData)
-  
-  /* if (beerData === "bad request") {
-    rootElement.innerHTML = "BAD USER"
-  } else {
-    rootElement.innerHTML = JSON.stringify(beerData)
-  } */
+  const beerData = await fetchUrl("/beers")
+  console.log(beerData)
+
+  makeDomFromData(rootElement, beerData)
 }
 
 init()
